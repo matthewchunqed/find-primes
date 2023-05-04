@@ -13,12 +13,19 @@ public class RThread implements Runnable {
 
     public void run () {
 
+        if(regionMin < 11){
+            regionMin = 11;
+        }else{
+
         if(regionMin % 2 == 0){
             regionMin += 1;
         }
         if(regionMin % 5 == 0){
             regionMin += 2;
         }
+
+    }
+        System.out.println("regionMin is " + regionMin + " and regionMax is " + regionMax);
         while(regionMin <= regionMax){
             //makes sure the regionMin is X1, X3, X7, X9.
             int div = 2;

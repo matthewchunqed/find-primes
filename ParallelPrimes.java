@@ -1,31 +1,34 @@
+import java.lang.Math;
 public class ParallelPrimes {
 
     // replace this string with your team name
     public static final String TEAM_NAME = "Benchmark";
-    public static final int MAX = Integer.MAX_VALUE;
+    public static final int MAX = 1_000_000;
+    //works for 10_814, 10_815.
+    //but not for 10_515.
     //public static final int MAX = Integer.MAX_VALUE;
 
     public static void optimizedPrimes(int[] primes) {
 
     int arrayLength = (int)(Math.sqrt(MAX));
 
-    boolean smallPrimes[] = new boolean[arrayLength];
+    int NUM_THREADS = Runtime.getRuntime().availableProcessors();
+
+    boolean smallPrimes[] = new boolean[arrayLength+NUM_THREADS];
     smallPrimes[2] = true; //2 is prime
     smallPrimes[3] = true; //3 is prime
     smallPrimes[5] = true; //5 is prime
     smallPrimes[7] = true; //7 is prime
     //check X1, X3, X5, X7 up to (Math.sqrt(primes.length)) to see if they're prime.
     //parallelize this, then do the bigger numbers sequentially.
-    	
-    int NUM_THREADS = Runtime.getRuntime().availableProcessors();
 
-    int threadDivide = ((arrayLength-11)/NUM_THREADS);
+    int threadDivide = ((arrayLength)/NUM_THREADS)+1;
 
     Thread[] threads = new Thread[NUM_THREADS];
 
 		// initialize threads with a welcome message
 		for (int i = 0; i < NUM_THREADS; i++) {
-			threads[i] = new Thread(new RThread(11+(i*threadDivide), 11+((i+1)*threadDivide)-1, smallPrimes));
+			threads[i] = new Thread(new RThread((i*threadDivide), ((i+1)*threadDivide)-1, smallPrimes));
             threads[i].start();
 		}
 

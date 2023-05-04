@@ -3,7 +3,7 @@
 
 public class Primes {
 
-    public static final int MAX_VALUE = Integer.MAX_VALUE;
+    public static final int MAX_VALUE = 1_000_000;
     public static final int N_PRIMES = 105_097_565;
     public static final int ROOT_MAX = (int) Math.sqrt(MAX_VALUE);
     public static final int MAX_SMALL_PRIME = 1 << 20;
