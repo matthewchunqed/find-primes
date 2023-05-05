@@ -12,17 +12,22 @@ public class SThread implements Runnable {
     private boolean[] smallPrimes;
 
     public SThread(int regionMin, int regionMax, int[] primes, AtomicInteger id, int end, int check, int uniqueID, AtomicInteger index) {
-        //checks if [regionMin, regionMax] is prime, inclusive of boundaries.
         if(regionMin > check){
 		this.regionMin = regionMin;
         }else{
             this.regionMin = check;
         }
+        this.regionMax = regionMax;
+        if(this.regionMin % 2 == 0){
+            this.regionMin++;
+        }
+        if(this.regionMax % 2 == 0){
+            this.regionMax--;
+        }
 
         this.regionMinCopy = this.regionMin;
-        this.regionMax = regionMax;
         this.primes = primes;
-        this.smallPrimes = new boolean[regionMax - regionMinCopy + 1];
+        this.smallPrimes = new boolean[(regionMax - regionMinCopy)/2 + 1];
         this.id = id;
         this.index = index;
         this.end = end;
@@ -42,7 +47,7 @@ public class SThread implements Runnable {
             regionMin += primes[i];
         }
         while(regionMin <= regionMax && regionMin > 0){
-            smallPrimes[regionMin - regionMinCopy] = true;      
+            smallPrimes[(regionMin - regionMinCopy)/2] = true;      
             regionMin = regionMin + primes[i] + primes[i];
         } 
         }else{
@@ -55,7 +60,7 @@ public class SThread implements Runnable {
             regionMin -= primes[i];
             }
         while(regionMin >= regionMinCopy){
-            smallPrimes[regionMin - regionMinCopy] = true;      
+            smallPrimes[(regionMin - regionMinCopy)/2] = true;      
             regionMin = regionMin - primes[i] - primes[i];
         } 
         } 
@@ -66,19 +71,12 @@ public class SThread implements Runnable {
             }
         }
         int ind = index.get();
-        //System.out.print("Thread " + uniqueID + " is starting at primes index " + ind);
-        int i = 0;
-        if(regionMinCopy % 2 == 0){
-            i++;
-        }
-        while(i<smallPrimes.length){
+        for(int i=0; i<smallPrimes.length; i++){
             if(!smallPrimes[i]){
-                primes[ind] = i+regionMinCopy;
+                primes[ind] = i+i+regionMinCopy;
                 ind++;
             }
-            i=i+2;
         }
-        //System.out.println(" and ending at index " + ind);
         index.set(ind);
         id.set(uniqueID+1);
     }

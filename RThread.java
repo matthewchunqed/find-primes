@@ -5,7 +5,6 @@ public class RThread implements Runnable {
     private boolean[] smallPrimes;
 
     public RThread(int regionMin, int regionMax, boolean[] smallPrimes) {
-        //checks if [regionMin, regionMax] is prime, inclusive of boundaries.
 		this.regionMin = regionMin;
         this.regionMax = regionMax;
         this.smallPrimes = smallPrimes;
