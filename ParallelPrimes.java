@@ -76,7 +76,7 @@ public class ParallelPrimes {
         threads[i] = new Thread(new SThread((i*threadDivide), max, primes, id, end, check, i, ind));
         threads[i].start();
     }
-
+/*
     try{
         for(int i=0; i<NUM_THREADS; i++){
             threads[i].join();
@@ -85,7 +85,7 @@ public class ParallelPrimes {
             // handle the exception
         }
 
-	/*while(check < MAX && check > 0){
+	while(check < MAX && check > 0){
         
         boolean prime = true;
         for(int i=0; i<end; i++){
