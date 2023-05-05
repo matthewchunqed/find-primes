@@ -1,9 +1,9 @@
-import java.lang.Math;
+import java.util.concurrent.atomic.AtomicInteger;
 public class ParallelPrimes {
 
     // replace this string with your team name
     public static final String TEAM_NAME = "Benchmark";
-    public static final int MAX = 1_000_000;
+    public static final int MAX = 100_000_000;
     //works for 10_814, 10_815.
     //but not for 10_515.
     //public static final int MAX = Integer.MAX_VALUE;
@@ -63,7 +63,29 @@ public class ParallelPrimes {
         System.out.print("primes[" + i + "] is " + primes[i] + ", ");
     } */
 
-	while(check < MAX && check > 0){
+    AtomicInteger id = new AtomicInteger(0);
+    AtomicInteger ind = new AtomicInteger(end);
+
+    threadDivide = (MAX/NUM_THREADS)+1;
+
+    for (int i = 0; i < NUM_THREADS; i++) {
+        int max = ((i+1)*threadDivide)-1;
+        if(max < 0){
+            max = MAX;
+        }
+        threads[i] = new Thread(new SThread((i*threadDivide), max, primes, id, end, check, i, ind));
+        threads[i].start();
+    }
+
+    try{
+        for(int i=0; i<NUM_THREADS; i++){
+            threads[i].join();
+        }
+    } catch (InterruptedException e) {
+            // handle the exception
+        }
+
+	/*while(check < MAX && check > 0){
         
         boolean prime = true;
         for(int i=0; i<end; i++){
@@ -81,7 +103,7 @@ public class ParallelPrimes {
         }else{
             check += 2;
         }
-    }
+    } */
 
     
 	return;
