@@ -17,19 +17,21 @@ public class RThread implements Runnable {
             regionMin = 4;
         }
        // System.out.println("regionMin is " + regionMin + " and regionMax is " + regionMax);
+        int real;
+        boolean prime;
         while(regionMin <= regionMax){
             //makes sure the regionMin is X1, X3, X7, X9.
-            int real = 10*(regionMin/4) + 1 + 2*(regionMin % 4);
+            real = 10*(regionMin/4) + 1 + 2*(regionMin % 4);
             if(regionMin % 4 == 2 || regionMin % 4 == 3){
                 real += 2;
             }
-            boolean prime = true;
+            prime = false;
             for(int i=3; i<=real; i++){
                 if(real % i == 0){
-                    prime = false;
                     break;
                 }
                 if(i*i > real){
+                    prime = true;
                     break;
                 }
             }

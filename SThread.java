@@ -11,12 +11,8 @@ public class SThread implements Runnable {
     private int uniqueID;
     private boolean[] smallPrimes;
 
-    public SThread(int regionMin, int regionMax, int[] primes, AtomicInteger id, int end, int check, int uniqueID, AtomicInteger index) {
-        if(regionMin > check){
+    public SThread(int regionMin, int regionMax, int[] primes, AtomicInteger id, int end, int uniqueID, AtomicInteger index) {
 		this.regionMin = regionMin;
-        }else{
-            this.regionMin = check;
-        }
         this.regionMax = regionMax;
         if(this.regionMin % 2 == 0){
             this.regionMin++;
@@ -36,10 +32,11 @@ public class SThread implements Runnable {
 
     public void run () {
 
+    int remainder;
     for(int i=1; i<end; i++){
         if(i % 2 == 1){
         regionMin = regionMinCopy;
-        int remainder = regionMin % primes[i];
+        remainder = regionMin % primes[i];
         if(remainder > 0){
             regionMin += (primes[i] - remainder);
         }
@@ -52,7 +49,7 @@ public class SThread implements Runnable {
         } 
         }else{
             regionMin = regionMax;
-            int remainder = regionMin % primes[i];
+            remainder = regionMin % primes[i];
             if(remainder > 0){
             regionMin -= remainder;
             }
@@ -71,11 +68,13 @@ public class SThread implements Runnable {
             }
         }
         int ind = index.get();
+        int store = regionMinCopy;
         for(int i=0; i<smallPrimes.length; i++){
             if(!smallPrimes[i]){
-                primes[ind] = i+i+regionMinCopy;
+                primes[ind] = store;
                 ind++;
             }
+            store += 2;
         }
         index.set(ind);
         id.set(uniqueID+1);

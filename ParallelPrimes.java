@@ -54,9 +54,10 @@ public class ParallelPrimes {
     primes[1] = 3;
     primes[2] = 5;
     primes[3] = 7;
+    int real;
     for(int i=4; i<smallPrimes.length; i++){
         if(smallPrimes[i]){
-            int real = 10*(i/4) + 1 + 2*(i % 4);
+            real = 10*(i/4) + 1 + 2*(i % 4);
             if(i % 4 == 2 || i % 4 == 3){
                 real += 2;
             }
@@ -64,19 +65,17 @@ public class ParallelPrimes {
             index++; 
         }
     }
-    int end = index;
-
     AtomicInteger id = new AtomicInteger(0);
-    AtomicInteger ind = new AtomicInteger(end);
+    AtomicInteger ind = new AtomicInteger(index);
 
-    threadDivide = (MAX/NUM_THREADS)+1;
+    threadDivide = ((MAX-check)/NUM_THREADS)+1;
 
     for (int i = 0; i < NUM_THREADS; i++) {
-        int max = ((i+1)*threadDivide)-1;
+        int max = check+((i+1)*threadDivide)-1;
         if(max < 0){
             max = MAX;
         }
-        threads[i] = new Thread(new SThread((i*threadDivide), max, primes, id, end, check, i, ind));
+        threads[i] = new Thread(new SThread(check+(i*threadDivide), max, primes, id, index, i, ind));
         threads[i].start();
     }
 
