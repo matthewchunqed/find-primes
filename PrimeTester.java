@@ -4,7 +4,7 @@
 
 public class PrimeTester {
     public static final int WARMUP_ITERATIONS = 5;
-    public static final int TEST_ITERATIONS = 1;
+    public static final int TEST_ITERATIONS = 10;
     
     public static void main (String[] args) {
 	System.out.println("Computing primes up to " + Primes.MAX_VALUE);
@@ -31,7 +31,7 @@ public class PrimeTester {
 	    ParallelPrimes.optimizedPrimes(testPrimes);
 	}
 
-	elapsedMS = (System.nanoTime() - start) / 1_000_000;
+	elapsedMS = (System.nanoTime() - start) / (TEST_ITERATIONS*1_000_000);
 
 	// check correctness
 

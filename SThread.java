@@ -31,27 +31,33 @@ public class SThread implements Runnable {
 
     public void run () {
 
-        //System.out.println("regionMin is " + regionMin + " and regionMax is " + regionMax);
-       /* int cursor;
-        for(int i=1; i<end; i++){
-            cursor = regionMin;
-            if(cursor % primes[i] > 0){
-                cursor += (primes[i] - (cursor % primes[i]));
-            }
-            while(cursor <= regionMax && cursor > 0){
-                smallPrimes[cursor - regionMinCopy] = true;
-                cursor += primes[i];
-            }
-        } */
     for(int i=1; i<end; i++){
+        if(i % 2 == 1){
         regionMin = regionMinCopy;
-        while(regionMin % primes[i] > 0){
-            regionMin += 1;
+        int remainder = regionMin % primes[i];
+        if(remainder > 0){
+            regionMin += (primes[i] - remainder);
+        }
+        if(regionMin % 2 == 0){
+            regionMin += primes[i];
         }
         while(regionMin <= regionMax && regionMin > 0){
-            //makes sure the regionMin is X1, X3, X7, X9.
             smallPrimes[regionMin - regionMinCopy] = true;      
-            regionMin += primes[i];
+            regionMin = regionMin + primes[i] + primes[i];
+        } 
+        }else{
+            regionMin = regionMax;
+            int remainder = regionMin % primes[i];
+            if(remainder > 0){
+            regionMin -= remainder;
+            }
+            if(regionMin % 2 == 0){
+            regionMin -= primes[i];
+            }
+        while(regionMin >= regionMinCopy){
+            smallPrimes[regionMin - regionMinCopy] = true;      
+            regionMin = regionMin - primes[i] - primes[i];
+        } 
         } 
     } 
         while(id.get() != uniqueID){
