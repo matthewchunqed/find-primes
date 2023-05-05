@@ -9,40 +9,34 @@ public class RThread implements Runnable {
         this.regionMax = regionMax;
         this.smallPrimes = smallPrimes;
     }
-
+    //smallPrimes[4] = 11, smallPrimes[5] = 13, smallPrimes[6] = 17, smallPrimes[7] = 19
+    //smallPrimes[8] = 21, smallPrimes[9] = 23, smallPrimes[10] = 27, smallPrimes[11] = 29
     public void run () {
 
-        if(regionMin < 11){
-            regionMin = 11;
-        }else{
-
-        if(regionMin % 2 == 0){
-            regionMin += 1;
+        if(regionMin < 4){
+            regionMin = 4;
         }
-        if(regionMin % 5 == 0){
-            regionMin += 2;
-        }
-
-    }
        // System.out.println("regionMin is " + regionMin + " and regionMax is " + regionMax);
         while(regionMin <= regionMax){
             //makes sure the regionMin is X1, X3, X7, X9.
-            int div = 2;
-            for(int i=3; i<=regionMax; i++){
-                if(regionMin % i == 0){
-                    div = i;
+            int real = 10*(regionMin/4) + 1 + 2*(regionMin % 4);
+            if(regionMin % 4 == 2 || regionMin % 4 == 3){
+                real += 2;
+            }
+            boolean prime = true;
+            for(int i=3; i<=real; i++){
+                if(real % i == 0){
+                    prime = false;
+                    break;
+                }
+                if(i*i > real){
                     break;
                 }
             }
 
-            if(regionMin == div){
-                smallPrimes[regionMin] = true;
-            }
-            if(regionMin % 10 == 3){
-                regionMin += 4;
-            }else{
-                regionMin += 2;
-            }
+            smallPrimes[regionMin] = prime;
+            
+            regionMin++;
         }
 
     }
