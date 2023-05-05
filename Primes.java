@@ -3,7 +3,7 @@
 
 public class Primes {
 
-    public static final int MAX_VALUE = 100_000_000;
+    public static final int MAX_VALUE = Integer.MAX_VALUE;
     public static final int N_PRIMES = 105_097_565;
     public static final int ROOT_MAX = (int) Math.sqrt(MAX_VALUE);
     public static final int MAX_SMALL_PRIME = 1 << 20;
@@ -12,12 +12,6 @@ public class Primes {
     // to max. The largest allowed value of max is MAX_SMALL_PRIME.
     public static int[] getSmallPrimesUpTo(int max) {
 
-	// check that the value max is in bounds, and throw an
-	// exception if not
-	if (max > MAX_SMALL_PRIME) {
-	    throw new RuntimeException("The value " + max + "exceeds the maximum small prime value (" + MAX_SMALL_PRIME + ")");
-	}
-
 	// isPrime[i] will be true if and only if i is
 	// prime. Initially set isPrime[i] to true for all i >= 2.
 	boolean[] isPrime = new boolean[max];
@@ -25,8 +19,6 @@ public class Primes {
 	for (int i = 2; i < max; i++) {
 	    isPrime[i] = true;
 	}
-
-	
 
 	// Apply the sieve of Eratosthenes to find primes. The
 	// procedure iterates over values i = 2, 3,.... If isPrime[i]

@@ -3,7 +3,7 @@
 // ***DO NOT MODIFY THIS FILE***
 
 public class PrimeTester {
-    public static final int WARMUP_ITERATIONS = 0;
+    public static final int WARMUP_ITERATIONS = 10;
     public static final int TEST_ITERATIONS = 1;
     
     public static void main (String[] args) {
@@ -13,7 +13,11 @@ public class PrimeTester {
 	int[] testPrimes = new int[Primes.N_PRIMES];
 
 	// find known primes using the baseline procedure
+	long start = System.nanoTime();
 	Primes.baselinePrimes(knownPrimes);
+	long elapsedMS = (System.nanoTime() - start) / 1_000_000;
+	System.out.println("Baseline: " + elapsedMS + "ms");
+    
 
 	// run warmup before timing
 	for (int i = 0; i < WARMUP_ITERATIONS; i++) {
@@ -21,13 +25,13 @@ public class PrimeTester {
 	}
 
 	// run main iterations
-	long start = System.nanoTime();
+	start = System.nanoTime();
 	
 	for (int i = 0; i < TEST_ITERATIONS; i++) {
 	    ParallelPrimes.optimizedPrimes(testPrimes);
 	}
 
-	long elapsedMS = (System.nanoTime() - start) / 1_000_000;
+	elapsedMS = (System.nanoTime() - start) / 1_000_000;
 
 	// check correctness
 

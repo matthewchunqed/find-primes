@@ -3,7 +3,7 @@ public class ParallelPrimes {
 
     // replace this string with your team name
     public static final String TEAM_NAME = "Benchmark";
-    public static final int MAX = 100_000_000;
+    public static final int MAX = Integer.MAX_VALUE;
     //works for 10_814, 10_815.
     //but not for 10_515.
     //public static final int MAX = Integer.MAX_VALUE;

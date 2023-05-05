@@ -25,7 +25,7 @@ public class RThread implements Runnable {
         }
 
     }
-        System.out.println("regionMin is " + regionMin + " and regionMax is " + regionMax);
+       // System.out.println("regionMin is " + regionMin + " and regionMax is " + regionMax);
         while(regionMin <= regionMax){
             //makes sure the regionMin is X1, X3, X7, X9.
             int div = 2;
