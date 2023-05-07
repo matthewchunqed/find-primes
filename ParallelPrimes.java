@@ -8,7 +8,11 @@ public class ParallelPrimes {
 
     int arrayLength = (int)(Math.sqrt(MAX));
 
-    int NUM_THREADS = Runtime.getRuntime().availableProcessors();
+    int processors = Runtime.getRuntime().availableProcessors();
+    int NUM_THREADS = processors;
+    if(processors > 100){
+        NUM_THREADS = 100;
+    }
 
     int length = ((arrayLength+NUM_THREADS)/10)*4;
     boolean smallPrimes[] = new boolean[length];
@@ -67,7 +71,7 @@ public class ParallelPrimes {
         }
     }
 
-    NUM_THREADS = Runtime.getRuntime().availableProcessors();
+    NUM_THREADS = 100;
     AtomicInteger id = new AtomicInteger(0);
     AtomicInteger ind = new AtomicInteger(index);
 
