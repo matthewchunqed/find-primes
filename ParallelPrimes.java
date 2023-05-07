@@ -1,7 +1,6 @@
 import java.util.concurrent.atomic.AtomicInteger;
 public class ParallelPrimes {
 
-    // replace this string with your team name
     public static final String TEAM_NAME = "Benchmark";
     public static final int MAX = Integer.MAX_VALUE;
 
@@ -17,14 +16,13 @@ public class ParallelPrimes {
     smallPrimes[1] = true; //3 is prime
     smallPrimes[2] = true; //5 is prime
     smallPrimes[3] = true; //7 is prime
-    //starting at smallPrimes[4] = X1, smallPrimes[5] = X3, smallPrimes[6] = X7, smallPrimes[7] = X9
-    //check X1, X3, X7, X9 up to (Math.sqrt(primes.length)) to see if they're prime.
+    //starting at smallPrimes[4] = X1, smallPrimes[5] = X3, smallPrimes[6] = X7, smallPrimes[7] = X9, etc.
 
     int threadDivide = (length/NUM_THREADS);
 
     Thread[] threads = new Thread[NUM_THREADS];
-
-		// initialize threads with a welcome message
+    NUM_THREADS = 4;
+		// initialize threads
 		for (int i = 0; i < NUM_THREADS-1; i++) {
 			threads[i] = new Thread(new RThread((i*threadDivide), ((i+1)*threadDivide)-1, smallPrimes));
             threads[i].start();
@@ -32,6 +30,8 @@ public class ParallelPrimes {
 			threads[NUM_THREADS-1] = new Thread(new RThread(((NUM_THREADS-1)*threadDivide), length-1, smallPrimes));
             threads[NUM_THREADS-1].start();
 
+
+        //wait for threads to complete
         try{
             for(int i=0; i<NUM_THREADS; i++){
                 threads[i].join();
@@ -48,7 +48,8 @@ public class ParallelPrimes {
     if(check % 5 == 0){
         check += 2;
     }
-    
+    //store where the other threads should pick up progress after sqrt(INT_MAX)
+
     int index = 4;
     primes[0] = 2;
     primes[1] = 3;
@@ -65,10 +66,13 @@ public class ParallelPrimes {
             index++; 
         }
     }
+
+    NUM_THREADS = Runtime.getRuntime().availableProcessors();
     AtomicInteger id = new AtomicInteger(0);
     AtomicInteger ind = new AtomicInteger(index);
 
     threadDivide = ((MAX-check)/NUM_THREADS)+1;
+    //make threads that apply the sieve, then sequentially inserts each thread's findings on each individual thread's region into the primes array.
 
     for (int i = 0; i < NUM_THREADS; i++) {
         int max = check+((i+1)*threadDivide)-1;
