@@ -59,6 +59,7 @@ public class ParallelPrimes {
     primes[1] = 3;
     primes[2] = 5;
     primes[3] = 7;
+    //insert smallPrimes[] into primes[]
     int real;
     for(int i=4; i<smallPrimes.length; i++){
         if(smallPrimes[i]){

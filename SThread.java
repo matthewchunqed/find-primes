@@ -69,6 +69,8 @@ public class SThread implements Runnable {
     (which is on line 40-47 and 53-60)
     After aligning with multiples of primes[i], we mark every second instance of primes[i] (e.g. mark 3, 9, 15, etc. for primes[i] = 3), because our array only represents odd numbers.
     This occurs on lines 48-51 and 61-64.
+
+    (There was a slowdown observed when comments were placed in the loop, so comments are out here.)
     */
 
         while(id.get() != uniqueID){

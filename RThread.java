@@ -19,11 +19,13 @@ public class RThread implements Runnable {
         boolean prime;
         //makes sure the regionMin is X1, X3, X7, X9, then computes the prime for the corresponding smallPrimes[i].
         while(regionMin <= regionMax){
+            
             real = 10*(regionMin/4) + 1 + 2*(regionMin % 4);
             if(regionMin % 4 == 2 || regionMin % 4 == 3){
                 real += 2;
             }
             prime = false;
+            //above applies array bijection -> X1/X3/X7/X9, and below checks all factors
             for(int i=3; i<=real; i=i+2){
                 if(real % i == 0){
                     break;
