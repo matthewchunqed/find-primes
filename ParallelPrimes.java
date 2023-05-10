@@ -7,8 +7,7 @@ public class ParallelPrimes {
     public static final int ROOT_MAX = Primes.ROOT_MAX;
     // replace this string with your team name
     public static final String TEAM_NAME = "Benchmark";
-    // Number of threads available for use
-    public static final int N_THREADS = Runtime.getRuntime().availableProcessors();
+
     // Number of tasks, should be 46341
     public static final int N_TASKS = MAX_VALUE / (ROOT_MAX * 64);
 
@@ -17,7 +16,7 @@ public class ParallelPrimes {
         int NUM_THREADS = 4;
 
         int arrayLength = (int)(Math.sqrt(MAX_VALUE));
-        int length = (arrayLength/10)*4;
+        int length = ((arrayLength/10) << 2);
         boolean smallPrimes[] = new boolean[length];
         smallPrimes[0] = true; primes[0] = 2; //2 is prime
         smallPrimes[1] = true; primes[1] = 3; //3 is prime
@@ -47,23 +46,17 @@ public class ParallelPrimes {
         int count = 4;
         for(int i=4; i<smallPrimes.length; i++){
             if(smallPrimes[i]){
-               real = 10*(i/4) + 1 + 2*(i % 4);
-                if(i % 4 == 2 || i % 4 == 3){
-                    real += 2;
-                }
+               real = 10*(i >> 2) + 1 + ((i & 0b11) << 1) + (((i&0b11)>>1) << 1);
                 primes[count] = real;
                 count++; 
             }
         }
-
-        // We don't need to compute small primes since it is hard-coded
-//        int[] smallPrimes = Primes.getSmallPrimes();
-        int nPrimes = primes.length; // Should be the same as N_PRIMES (105_097_565)
-
-        // check if we've already filled primes, and return if so
-//        if (nPrimes == minSize) {
-//            return;
-//        }
+        
+        // Number of threads available for use
+        int N_THREADS = Runtime.getRuntime().availableProcessors();
+        if(N_THREADS > 100){
+            N_THREADS = 70;
+        }
 
         ExecutorService pool = Executors.newFixedThreadPool(N_THREADS);
         //creates a pool of threads that will jointly work on the tasks
@@ -77,7 +70,7 @@ public class ParallelPrimes {
             //pull the results from the Futures and add them to primes.
             for (Future<int[]> result : results) {
                 int[] component = result.get();
-                for (int i = 0; i < component.length && count < nPrimes; i++) {
+                for (int i = 0; i < component.length; i++) {
                     primes[count++] = component[i];
                 }
             }
@@ -137,6 +130,7 @@ class findPrimes implements Callable<int[]> {
             regionMin += (cursor - remainder);
         }
         if((regionMin & 0b1) == 0){
+            //lowest multiple of prime[i]^2 
             regionMin += cursor;
         }
         while(regionMin <= regionMax && regionMin > 0){
