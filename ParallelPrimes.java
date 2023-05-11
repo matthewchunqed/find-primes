@@ -15,15 +15,12 @@ public class ParallelPrimes {
         int NUM_THREADS = 4;
 
         int arrayLength = (int)(Math.sqrt(MAX_VALUE));
-        int length = ((arrayLength/10) << 2);
-        boolean smallPrimes[] = new boolean[length];
-        smallPrimes[0] = true; primes[0] = 2; 
-        smallPrimes[1] = true; primes[1] = 3; 
-        smallPrimes[2] = true; primes[2] = 5; 
-        smallPrimes[3] = true; primes[3] = 7; 
-        //2, 3, 5, 7 prime. hard code before checking X1/X3/X7/X9 elements
+        int length = (((arrayLength/10) << 2) >> 5)+1;
+        int smallPrimes[] = new int[length];
+        smallPrimes[0] = 0b1111; primes[0] = 2; primes[1] = 3; primes[2] = 5; primes[3] = 7;
+        //2, 3, 5, 7 prime. hard coded before checking X1/X3/X7/X9 elements
 
-        int threadDivide = (length/NUM_THREADS);
+        int threadDivide = (((arrayLength/10) << 2)/NUM_THREADS);
         
         Thread[] threads = new Thread[NUM_THREADS];
 		// initialize threads
@@ -31,7 +28,7 @@ public class ParallelPrimes {
 			threads[i] = new Thread(new RThread((i*threadDivide), ((i+1)*threadDivide)-1, smallPrimes));
             threads[i].start();
 		}
-			threads[NUM_THREADS-1] = new Thread(new RThread(((NUM_THREADS-1)*threadDivide), length-1, smallPrimes));
+			threads[NUM_THREADS-1] = new Thread(new RThread(((NUM_THREADS-1)*threadDivide), ((arrayLength/10) << 2), smallPrimes));
             threads[NUM_THREADS-1].start();
 
         //wait for threads to complete
@@ -42,13 +39,22 @@ public class ParallelPrimes {
         } catch (InterruptedException e) {
             } 
 
-        int real;
         int count = 4;
-        for(int i=4; i<smallPrimes.length; i++){
-            if(smallPrimes[i]){
-               real = 10*(i >> 2) + 1 + ((i & 0b11) << 1) + (((i&0b11)>>1) << 1);
-                primes[count] = real;
+        int curr = smallPrimes[0];
+        //apply compression bijection: smallPrimesOld[i] = smallPrimes[(i >> 5) << (i&0b11111)]
+        for(int j=4; j<32; j++){
+            if(((curr >> j) & 0b1) == 1){
+                primes[count] = 10*(j >> 2) + 1 + ((j & 0b11) << 1) + (((j&0b11)>>1) << 1);
                 count++; 
+            }
+        }
+        for(int i=1; i<smallPrimes.length; i++){
+            curr = smallPrimes[i];
+            for(int j=0; j<32; j++){
+            if(((curr >> j) & 0b1) == 1){
+                primes[count] = 10*(((i << 5)+j) >> 2) + 1 + ((((i << 5)+j) & 0b11) << 1) + (((((i << 5)+j)&0b11)>>1) << 1);
+                count++; 
+            }
             }
         }
         
