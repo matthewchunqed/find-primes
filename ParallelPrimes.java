@@ -15,8 +15,8 @@ public class ParallelPrimes {
         int NUM_THREADS = 4;
 
         int arrayLength = (int)(Math.sqrt(MAX_VALUE));
-        int length = (((arrayLength/10) << 2) >> 5)+1;
-        int smallPrimes[] = new int[length];
+        int length = (((arrayLength/10) << 2) >> 6)+1;
+        long smallPrimes[] = new long[length];
         smallPrimes[0] = 0b1111; primes[0] = 2; primes[1] = 3; primes[2] = 5; primes[3] = 7;
         //2, 3, 5, 7 prime. hard coded before checking X1/X3/X7/X9 elements
 
@@ -40,9 +40,9 @@ public class ParallelPrimes {
             } 
 
         int count = 4;
-        int curr = smallPrimes[0];
+        long curr = smallPrimes[0];
         //apply compression bijection: smallPrimesOld[i] = smallPrimes[(i >> 5) << (i&0b11111)]
-        for(int j=4; j<32; j++){
+        for(int j=4; j<64; j++){
             if(((curr >> j) & 0b1) == 1){
                 primes[count] = 10*(j >> 2) + 1 + ((j & 0b11) << 1) + (((j&0b11)>>1) << 1);
                 count++; 
@@ -50,9 +50,9 @@ public class ParallelPrimes {
         }
         for(int i=1; i<smallPrimes.length; i++){
             curr = smallPrimes[i];
-            for(int j=0; j<32; j++){
+            for(int j=0; j<64; j++){
             if(((curr >> j) & 0b1) == 1){
-                primes[count] = 10*(((i << 5)+j) >> 2) + 1 + ((((i << 5)+j) & 0b11) << 1) + (((((i << 5)+j)&0b11)>>1) << 1);
+                primes[count] = 10*(((i << 6)+j) >> 2) + 1 + ((((i << 6)+j) & 0b11) << 1) + (((((i << 6)+j)&0b11)>>1) << 1);
                 count++; 
             }
             }

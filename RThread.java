@@ -2,9 +2,9 @@ public class RThread implements Runnable {
 
     private int regionMin;
     private int regionMax;
-    private int[] smallPrimes;
+    private long[] smallPrimes;
 
-    public RThread(int regionMin, int regionMax, int[] smallPrimes) {
+    public RThread(int regionMin, int regionMax, long[] smallPrimes) {
 		this.regionMin = regionMin;
         this.regionMax = regionMax;
         this.smallPrimes = smallPrimes;
@@ -16,7 +16,7 @@ public class RThread implements Runnable {
             regionMin = 4;
         }
         int real;
-        int prime;
+        long prime;
         //makes sure the regionMin is X1, X3, X7, X9, then computes the prime for the corresponding smallPrimes[i].
         while(regionMin <= regionMax){
                            
@@ -34,7 +34,7 @@ public class RThread implements Runnable {
                 }
             }
         //apply compression bijection: smallPrimesOld[i] = smallPrimes[(i >> 5) << (i&0b11111)]
-            smallPrimes[regionMin >> 5] += (prime << (regionMin&0b11111));
+            smallPrimes[regionMin >> 6] += (prime << (regionMin&0b111111));
             regionMin++;
         }
     }
