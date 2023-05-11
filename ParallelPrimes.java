@@ -28,10 +28,10 @@ public class ParallelPrimes {
         Thread[] threads = new Thread[NUM_THREADS];
 		// initialize threads
 		for (int i = 0; i < NUM_THREADS-1; i++) {
-			threads[i] = new Thread(new RThread((i*threadDivide), ((i+1)*threadDivide)-1, smallPrimes));
+			threads[i] = new Thread(new RThread((i*threadDivide), ((i+1)*threadDivide)-1, smallPrimes, primes));
             threads[i].start();
 		}
-			threads[NUM_THREADS-1] = new Thread(new RThread(((NUM_THREADS-1)*threadDivide), length-1, smallPrimes));
+			threads[NUM_THREADS-1] = new Thread(new RThread(((NUM_THREADS-1)*threadDivide), length-1, smallPrimes, primes));
             threads[NUM_THREADS-1].start();
 
         //wait for threads to complete
@@ -42,17 +42,8 @@ public class ParallelPrimes {
         } catch (InterruptedException e) {
             } 
 
-        //populate primes[] with the results from smallPrimes.
-        int real;
-        int count = 4;
-        for(int i=4; i<smallPrimes.length; i++){
-            if(smallPrimes[i]){
-               real = 10*(i >> 2) + 1 + ((i & 0b11) << 1) + (((i&0b11)>>1) << 1);
-                primes[count] = real;
-                count++; 
-            }
-        }
-        
+        int count = 4792;
+        //define where to pick up at for large primes, then define thread count.
         int N_THREADS = Runtime.getRuntime().availableProcessors();
         if(N_THREADS > 100){
             N_THREADS = 70;
