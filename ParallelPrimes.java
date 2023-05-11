@@ -21,17 +21,17 @@ public class ParallelPrimes {
         smallPrimes[1] = true; primes[1] = 3; 
         smallPrimes[2] = true; primes[2] = 5; 
         smallPrimes[3] = true; primes[3] = 7; 
-        //2, 3, 5, 7 prime. hard code before checking X1/X3/X7/X9 elements >10.
+        //2, 3, 5, 7 prime. hard code before checking X1/X3/X7/X9 elements
 
         int threadDivide = (length/NUM_THREADS);
         
         Thread[] threads = new Thread[NUM_THREADS];
 		// initialize threads
 		for (int i = 0; i < NUM_THREADS-1; i++) {
-			threads[i] = new Thread(new RThread((i*threadDivide), ((i+1)*threadDivide)-1, smallPrimes, primes));
+			threads[i] = new Thread(new RThread((i*threadDivide), ((i+1)*threadDivide)-1, smallPrimes));
             threads[i].start();
 		}
-			threads[NUM_THREADS-1] = new Thread(new RThread(((NUM_THREADS-1)*threadDivide), length-1, smallPrimes, primes));
+			threads[NUM_THREADS-1] = new Thread(new RThread(((NUM_THREADS-1)*threadDivide), length-1, smallPrimes));
             threads[NUM_THREADS-1].start();
 
         //wait for threads to complete
@@ -42,23 +42,32 @@ public class ParallelPrimes {
         } catch (InterruptedException e) {
             } 
 
-        int count = 4792;
-        //define where to pick up at for large primes, then define thread count.
+        int real;
+        int count = 4;
+        for(int i=4; i<smallPrimes.length; i++){
+            if(smallPrimes[i]){
+               real = 10*(i >> 2) + 1 + ((i & 0b11) << 1) + (((i&0b11)>>1) << 1);
+                primes[count] = real;
+                count++; 
+            }
+        }
+        
+        // Number of threads available for use
         int N_THREADS = Runtime.getRuntime().availableProcessors();
         if(N_THREADS > 100){
             N_THREADS = 70;
         }
 
-        //create a pool and a task board for the primes
         ExecutorService pool = Executors.newFixedThreadPool(N_THREADS);
+        //creates a pool of threads that will jointly work on the tasks
         ArrayList<Future<int[]>> results = new ArrayList<>(N_TASKS);
-
-        //add the results to the Futures and wait for them to finish
+        //creates a task board for completion by thread pool
         for (long curBlock = ROOT_MAX; curBlock < MAX_VALUE; curBlock += (ROOT_MAX * 64)) {
+            //add the results to the Futures and wait for them to finish
             results.add(pool.submit(new findPrimes(primes, count, (int) curBlock)));
         }
         try {
-            //pull the results from the Futures and merge them into primes.
+            //pull the results from the Futures and add them to primes.
             for (Future<int[]> result : results) {
                 int[] component = result.get();
                 for (int i = 0; i < component.length; i++) {
@@ -80,8 +89,10 @@ class findPrimes implements Callable<int[]> {
     private int end;
 
     /*
-    defines the regionMin and regionMax of ints to be checked for prime candidacy
-    and "end", which denotes to the thread where the smallPrimes list ends in primes[]
+    PARAMS:
+    boolean[] isPrime: True if a number is prime, False if composite
+    int[] smallPrimes: An array of primes, from 1 to 46340
+    int curBlock: The offset, so that we know where to start from
      */
     public findPrimes(int[] primes, int end, int regionMin) {
         this.regionMin = regionMin;
@@ -99,15 +110,17 @@ class findPrimes implements Callable<int[]> {
         this.primes = primes;
         this.smallPrimes = new boolean[((regionMax - regionMinCopy) >> 1) + 1];
         this.end = end;
+        //isPrime[i] = regionMin + 2*i
     }
 
+    //given the class variables, return a result array of primes.
     @Override
     public int[] call() {
 
     int counter = smallPrimes.length;
     int remainder;
     int cursor; 
-    //loops in alternating directions for spatial locality
+    //loops in alternating directions for spatial locality (lines 39 & 52)
     for(int i=1; i<end; i++){
         cursor = primes[i];
         if((i & 0b1) == 1){
@@ -119,8 +132,9 @@ class findPrimes implements Callable<int[]> {
         if((regionMin & 0b1) == 0){
             regionMin += cursor;
         }
-        /*above sets regionMin pointer to be an odd multiple of prime[i].
-        below code applies the sieve to all future odd multiples of prime[i] to mark them off.
+        /*
+        above sets regionMin pointer to be an odd multiple of prime[i].
+        below code applies sieve to all future odd multiples of prime[i].
         */
         while(regionMin <= regionMax && regionMin > 0){
             if(!smallPrimes[(regionMin - regionMinCopy) >> 1]){
@@ -138,8 +152,9 @@ class findPrimes implements Callable<int[]> {
             if((regionMin & 0b1) == 0){
             regionMin -= cursor;
             }
-        /*above sets regionMin pointer to be an odd multiple of prime[i].
-        below code applies the sieve to all future odd multiples of prime[i] to mark them off.
+        /*
+        above sets regionMin pointer to be an odd multiple of prime[i].
+        below code applies sieve to all future odd multiples of prime[i].
         */
         while(regionMin >= regionMinCopy){
             if(!smallPrimes[(regionMin - regionMinCopy) >> 1]){
@@ -154,7 +169,7 @@ class findPrimes implements Callable<int[]> {
     int res[] = new int[counter];
     int ind = 0;
     int store = regionMinCopy;
-    //dumps the results into a res[] array which will be merged by the Futures.
+    //dumps the result into res[] array which gets merged into Primes[] by Future.
     for(int i=0; i<smallPrimes.length; i++){
         if(!smallPrimes[i]){
             res[ind] = store;
