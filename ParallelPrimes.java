@@ -141,7 +141,7 @@ class findPrimes implements Callable<int[]> {
                 smallPrimes[(regionMin - regionMinCopy) >> 1] = true;  
                 counter--;
             }    
-            regionMin = regionMin + cursor + cursor;
+            regionMin = regionMin + (cursor << 1);
         } 
         }else{
             regionMin = regionMax;
@@ -161,7 +161,7 @@ class findPrimes implements Callable<int[]> {
                 smallPrimes[(regionMin - regionMinCopy) >> 1] = true;  
                 counter--;
             }    
-            regionMin = regionMin - cursor - cursor;
+            regionMin = regionMin - (cursor << 1);
         } 
         } 
     }
