@@ -24,7 +24,7 @@ public class ParallelPrimes {
         int threadDivide = (((arrayLength/10) << 2)/NUM_THREADS);
         
         Thread[] threads = new Thread[NUM_THREADS];
-		// initialize threads and set each of them to
+		// initialize threads 
 		for (int i = 0; i < NUM_THREADS-1; i++) {
 			threads[i] = new Thread(new RThread((i*threadDivide), ((i+1)*threadDivide)-1, smallPrimes));
             threads[i].start();
