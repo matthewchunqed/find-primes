@@ -20,6 +20,7 @@ public class ParallelPrimes {
         smallPrimes[0] = 0b1111; primes[0] = 2; primes[1] = 3; primes[2] = 5; primes[3] = 7;
         //2, 3, 5, 7 prime. hard coded before checking X1/X3/X7/X9 elements
 
+        //divide the array into subarrays for each thread
         int threadDivide = (((arrayLength/10) << 2)/NUM_THREADS);
         
         Thread[] threads = new Thread[NUM_THREADS];
@@ -42,33 +43,35 @@ public class ParallelPrimes {
         int count = 4;
         long curr = smallPrimes[0];
         //apply compression bijection: smallPrimesOld[i] = smallPrimes[(i >> 5) << (i&0b11111)]
+        //bitshifting is used throughout to minimize latency due to 
         for(int j=4; j<64; j++){
             if(((curr >> j) & 0b1) == 1){
-                primes[count] = 10*(j >> 2) + 1 + ((j & 0b11) << 1) + (((j&0b11)>>1) << 1);
-                count++; 
+                primes[count] = (((j >> 2)<<3)+((j >> 2)<<1)) + 1 + ((j & 0b11) << 1) + (((j&0b11)>>1) << 1);
+                count++;            //(j>>2)*10 
             }
         }
         for(int i=1; i<smallPrimes.length; i++){
             curr = smallPrimes[i];
             for(int j=0; j<64; j++){
             if(((curr >> j) & 0b1) == 1){
-                primes[count] = 10*(((i << 6)+j) >> 2) + 1 + ((((i << 6)+j) & 0b11) << 1) + (((((i << 6)+j)&0b11)>>1) << 1);
-                count++; 
+                primes[count] = (((((i << 6)+j) >> 2)<<3)+((((i << 6)+j) >> 2)<<1)) + 1 + ((((i << 6)+j) & 0b11) << 1) + (((((i << 6)+j)&0b11)>>1) << 1);
+                count++;                          //((i<<6)+j)*10
             }
             }
         }
         
         // Number of threads available for use
+        //we during testing that over 100 threads ran slower than 60, so processor numbers are capped
         int N_THREADS = Runtime.getRuntime().availableProcessors();
         if(N_THREADS > 100){
-            N_THREADS = 70;
+            N_THREADS = 60;
         }
 
         ExecutorService pool = Executors.newFixedThreadPool(N_THREADS);
         //creates a pool of threads that will jointly work on the tasks
         ArrayList<Future<int[]>> results = new ArrayList<>(N_TASKS);
         //creates a task board for completion by thread pool
-        for (long curBlock = ROOT_MAX; curBlock < MAX_VALUE; curBlock += (ROOT_MAX * 64)) {
+        for (long curBlock = ROOT_MAX; curBlock < MAX_VALUE; curBlock += (ROOT_MAX << 6)) {
             //add the results to the Futures and wait for them to finish
             results.add(pool.submit(new findPrimes(primes, count, (int) curBlock)));
         }
@@ -102,7 +105,7 @@ class findPrimes implements Callable<int[]> {
      */
     public findPrimes(int[] primes, int end, int regionMin) {
         this.regionMin = regionMin;
-        this.regionMax = this.regionMin + (ParallelPrimes.ROOT_MAX * 64) - 1;
+        this.regionMax = this.regionMin + (ParallelPrimes.ROOT_MAX << 6) - 1;
         if(regionMax <= 0){
             regionMax = Integer.MAX_VALUE;
         }
