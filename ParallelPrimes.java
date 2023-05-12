@@ -24,11 +24,12 @@ public class ParallelPrimes {
         int threadDivide = (((arrayLength/10) << 2)/NUM_THREADS);
         
         Thread[] threads = new Thread[NUM_THREADS];
-		// initialize threads
+		// initialize threads and set each of them to
 		for (int i = 0; i < NUM_THREADS-1; i++) {
 			threads[i] = new Thread(new RThread((i*threadDivide), ((i+1)*threadDivide)-1, smallPrimes));
             threads[i].start();
 		}
+            //initializes the final thread
 			threads[NUM_THREADS-1] = new Thread(new RThread(((NUM_THREADS-1)*threadDivide), ((arrayLength/10) << 2), smallPrimes));
             threads[NUM_THREADS-1].start();
 
@@ -43,7 +44,7 @@ public class ParallelPrimes {
         int count = 4;
         long curr = smallPrimes[0];
         //apply compression bijection: smallPrimesOld[i] = smallPrimes[(i >> 5) << (i&0b11111)]
-        //bitshifting is used throughout to minimize latency due to 
+        //bitshifting is used throughout to minimize latency
         for(int j=4; j<64; j++){
             if(((curr >> j) & 0b1) == 1){
                 primes[count] = (((j >> 2)<<3)+((j >> 2)<<1)) + 1 + ((j & 0b11) << 1) + (((j&0b11)>>1) << 1);
